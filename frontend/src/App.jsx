@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
 import Header from "./components/Header";
 import Tasks from "./components/Tasks";
-import TaskForm from "./components/TaskForm";
+import TaskForm from "./components/TaskForm";      
 import axios from "axios";
 
 const App = () => {
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(false); 
   const [tasks, setTasks] = useState([]);
+
+  const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000"; // API URL من متغير البيئة
 
   useEffect(() => {
     const fetchTasks = async () => {
-      const { data } = await axios.get("/tasks");
+      const { data } = await axios.get(`${apiUrl}/tasks`);
       console.log(data);
       setTasks(data);
     };
@@ -18,7 +20,7 @@ const App = () => {
   }, []);
 
   const addTask = async (task) => {
-    const res = await fetch("/tasks", {
+    const res = await fetch(`${apiUrl}/tasks`, {
       method: "post",
       headers: {
         "content-type": "application/json",
@@ -32,7 +34,7 @@ const App = () => {
   };
 
   const deleteTask = async (id) => {
-    await axios.delete(`/tasks/${id}`);
+    await axios.delete(`${apiUrl}/tasks/${id}`);
 
     setTasks(tasks.filter((task) => task._id !== id));
   };
@@ -54,3 +56,4 @@ const App = () => {
 };
 
 export default App;
+

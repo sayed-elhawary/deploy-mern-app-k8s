@@ -1,13 +1,25 @@
-FROM node:18-alpine
+# Step 1: بناء المشروع باستخدام Node.js
+FROM node:18 AS build
 
 WORKDIR /app
 
-COPY package.json .
-
+COPY package*.json ./
 RUN npm install
 
 COPY . .
 
-EXPOSE 3000
+RUN npm run build
 
-CMD [ "npm", "start" ]
+# Step 2: خدمة المشروع باستخدام Nginx
+FROM nginx:alpine
+
+# نسخ ملفات البناء من المرحلة السابقة
+COPY --from=build /app/build /usr/share/nginx/html
+
+# تعيين متغير البيئة لـ API URL
+ENV REACT_APP_API_URL=http://backend:5000
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+
